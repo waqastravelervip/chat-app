@@ -31,54 +31,74 @@
   <!-- Main Content -->
   <div class="main-content" [class.sidebar-open]="isSidebarOpen">
     <main [class]="hasResults ? 'search-container with-results' : 'search-container'">
-      <div class="logo-container" [class.small]="hasResults">
-        <span class="g-logo">
-          <span style="color: #4285f4">S</span><span style="color: #ea4335">e</span><span style="color: #fbbc05">a</span><span style="color: #4285f4">r</span><span style="color: #34a853">c</span><span style="color: #ea4335">h</span>
-        </span>
-      </div>
-      <div class="search-box">
-        <div class="search-input-container">
-          <span class="material-icons search-icon">search</span>
+      <!-- Email Signup Form -->
+      <div class="email-signup" *ngIf="!(authService.isAuthenticated$ | async)">
+        <h2>Enter your email to start searching</h2>
+        <div class="email-input-container">
           <input 
-            #searchInput
-            type="text" 
-            [(ngModel)]="searchQuery" 
-            (keyup.enter)="performSearch()"
-            aria-label="Search"
-            [placeholder]="isLoading ? 'Searching...' : 'Type to search...'">
-          <button 
-            class="clear-button" 
-            *ngIf="searchQuery" 
-            (click)="clearSearch()"
-            aria-label="Clear search">
-            <span class="material-icons">close</span>
-          </button>
+            type="email" 
+            [(ngModel)]="emailInput" 
+            placeholder="Enter your email"
+            [class.invalid]="showEmailError"
+            (input)="onEmailInput()">
+          <button (click)="signUp()" [disabled]="!isValidEmail">Sign Up</button>
         </div>
-        <div class="search-buttons" *ngIf="!hasResults">
-          <button class="search-button" (click)="performSearch()">Search</button>
+        <div class="email-error" *ngIf="showEmailError">
+          Please enter a valid email address
         </div>
       </div>
 
-      <div class="results-container" *ngIf="hasResults">
-        <div class="chat-header" *ngIf="currentSession">
-          <button class="new-chat-button" (click)="startNewSession()">
-            <span class="material-icons">add</span>
-            New Chat
-          </button>
+      <!-- Search Interface (Only shown when authenticated) -->
+      <ng-container *ngIf="authService.isAuthenticated$ | async">
+        <div class="logo-container" [class.small]="hasResults">
+          <span class="g-logo">
+            <span style="color: #4285f4">S</span><span style="color: #ea4335">e</span><span style="color: #fbbc05">a</span><span style="color: #4285f4">r</span><span style="color: #34a853">c</span><span style="color: #ea4335">h</span>
+          </span>
         </div>
-
-        <div class="loading-indicator" *ngIf="isLoading">
-          <div class="spinner"></div>
-          <p>Searching for the best results...</p>
-        </div>
-        
-        <div class="chat-thread" *ngIf="currentSession">
-          <div class="message" *ngFor="let message of currentSession.messages" [class.user-message]="message.role === 'user'" [class.assistant-message]="message.role === 'assistant'">
-            <div class="message-content" [innerHTML]="formatResponse(message.content)"></div>
-            <div class="message-timestamp">{{ message.timestamp | date:'shortTime' }}</div>
+        <div class="search-box">
+          <div class="search-input-container">
+            <span class="material-icons search-icon">search</span>
+            <input 
+              #searchInput
+              type="text" 
+              [(ngModel)]="searchQuery" 
+              (keyup.enter)="performSearch()"
+              aria-label="Search"
+              [placeholder]="isLoading ? 'Searching...' : 'Type to search...'">
+            <button 
+              class="clear-button" 
+              *ngIf="searchQuery" 
+              (click)="clearSearch()"
+              aria-label="Clear search">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+          <div class="search-buttons" *ngIf="!hasResults">
+            <button class="search-button" (click)="performSearch()">Search</button>
           </div>
         </div>
-      </div>
+
+        <div class="results-container" *ngIf="hasResults">
+          <div class="chat-header" *ngIf="currentSession">
+            <button class="new-chat-button" (click)="startNewSession()">
+              <span class="material-icons">add</span>
+              New Chat
+            </button>
+          </div>
+
+          <div class="loading-indicator" *ngIf="isLoading">
+            <div class="spinner"></div>
+            <p>Searching for the best results...</p>
+          </div>
+          
+          <div class="chat-thread" *ngIf="currentSession">
+            <div class="message" *ngFor="let message of currentSession.messages" [class.user-message]="message.role === 'user'" [class.assistant-message]="message.role === 'assistant'">
+              <div class="message-content" [innerHTML]="formatResponse(message.content)"></div>
+              <div class="message-timestamp">{{ message.timestamp | date:'shortTime' }}</div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
     </main>
 
     <footer>

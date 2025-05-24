@@ -505,4 +505,70 @@ footer {
   .logo-container.small .g-logo {
     font-size: 30px;
   }
+}
+
+.email-signup {
+  text-align: center;
+  margin: 2rem auto;
+  max-width: 400px;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.email-signup h2 {
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.email-input-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.email-input-container input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.email-input-container input.invalid {
+  border-color: #dc3545;
+}
+
+.email-input-container input:focus {
+  outline: none;
+  border-color: #4285f4;
+}
+
+.email-input-container button {
+  padding: 0.75rem 1.5rem;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.email-input-container button:hover {
+  background-color: #357abd;
+}
+
+.email-input-container button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.email-error {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
 } 

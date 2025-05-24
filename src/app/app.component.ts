@@ -1,5 +1,6 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { OpenAIService } from './openai.service';
+import { AuthService } from './auth.service';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -32,7 +33,15 @@ export class AppComponent {
   isSidebarOpen = false;
   currentYear = new Date().getFullYear();
 
-  constructor(private openAIService: OpenAIService) {}
+  // Email signup related properties
+  emailInput = '';
+  showEmailError = false;
+  isValidEmail = false;
+
+  constructor(
+    private openAIService: OpenAIService,
+    public authService: AuthService
+  ) {}
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
@@ -57,7 +66,7 @@ export class AppComponent {
     return session;
   }
 
-  performSearch() {
+  async performSearch() {
     if (!this.searchQuery.trim()) return;
     
     this.isLoading = true;
@@ -131,5 +140,27 @@ export class AppComponent {
     this.chatSessions = [];
     this.currentSession = null;
     this.clearSearch();
+  }
+
+  // Email signup related methods
+  onEmailInput() {
+    this.isValidEmail = this.authService.isValidEmail(this.emailInput);
+    this.showEmailError = !this.isValidEmail && this.emailInput.length > 0;
+  }
+
+  async signUp() {
+    if (!this.isValidEmail) {
+      this.showEmailError = true;
+      return;
+    }
+
+    try {
+      await this.authService.signUpWithEmail(this.emailInput);
+      this.emailInput = '';
+      this.showEmailError = false;
+    } catch (error) {
+      console.error('Signup error:', error);
+      // Handle signup error (you might want to show an error message to the user)
+    }
   }
 }
