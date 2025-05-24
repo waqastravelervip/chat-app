@@ -22,7 +22,7 @@ interface ChatSession {
 export class AppComponent {
   @ViewChild('searchInput') searchInput!: ElementRef;
   
-  title = 'Search';
+  title = 'Google Search with OpenAI';
   searchQuery = '';
   searchResult: string = '';
   isLoading = false;
