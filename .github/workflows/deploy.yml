@@ -8,15 +8,10 @@ on:
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,12 +27,12 @@ jobs:
 
       - name: Create environment files
         run: |
-          mkdir -p src/environments
           echo "export const environment = {
             production: false,
             openaiApiKey: '${{ secrets.OPENAI_API_KEY }}',
             openaiApiUrl: 'https://api.openai.com/v1/chat/completions'
           };" > src/environments/environment.ts
+          
           echo "export const environment = {
             production: true,
             openaiApiKey: '${{ secrets.OPENAI_API_KEY }}',
@@ -50,6 +45,8 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
+          token: ${{ secrets.PAT }}
           folder: dist/hello-world
           branch: gh-pages
-          clean: true 
+          clean: true
+          single-commit: true 
