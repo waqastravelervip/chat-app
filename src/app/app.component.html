@@ -1,0 +1,90 @@
+<div class="app-container">
+  <!-- Hamburger Menu -->
+  <button class="hamburger-menu" (click)="toggleSidebar()">
+    <span class="material-icons">{{ isSidebarOpen ? 'close' : 'menu' }}</span>
+  </button>
+
+  <!-- Left Sidebar -->
+  <div class="sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-header">
+      <h2>Chat Sessions</h2>
+      <button class="clear-history" (click)="clearHistory()" *ngIf="chatSessions.length > 0">
+        <span class="material-icons">delete</span>
+      </button>
+    </div>
+    <div class="chat-list" *ngIf="chatSessions.length > 0">
+      <div class="chat-item" 
+           *ngFor="let session of chatSessions" 
+           (click)="loadSession(session)"
+           [class.active]="currentSession?.id === session.id">
+        <div class="chat-title">{{ session.title }}</div>
+        <div class="chat-timestamp">{{ session.timestamp | date:'short' }}</div>
+        <div class="chat-preview">{{ session.messages[session.messages.length - 1]?.content | slice:0:50 }}...</div>
+      </div>
+    </div>
+    <div class="no-history" *ngIf="chatSessions.length === 0">
+      <span class="material-icons">history</span>
+      <p>No chat sessions yet</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" [class.sidebar-open]="isSidebarOpen">
+    <main [class]="hasResults ? 'search-container with-results' : 'search-container'">
+      <div class="logo-container" [class.small]="hasResults">
+        <span class="g-logo">
+          <span style="color: #4285f4">S</span><span style="color: #ea4335">e</span><span style="color: #fbbc05">a</span><span style="color: #4285f4">r</span><span style="color: #34a853">c</span><span style="color: #ea4335">h</span>
+        </span>
+      </div>
+      <div class="search-box">
+        <div class="search-input-container">
+          <span class="material-icons search-icon">search</span>
+          <input 
+            #searchInput
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            (keyup.enter)="performSearch()"
+            aria-label="Search"
+            [placeholder]="isLoading ? 'Searching...' : 'Type to search...'">
+          <button 
+            class="clear-button" 
+            *ngIf="searchQuery" 
+            (click)="clearSearch()"
+            aria-label="Clear search">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <div class="search-buttons" *ngIf="!hasResults">
+          <button class="search-button" (click)="performSearch()">Search</button>
+        </div>
+      </div>
+
+      <div class="results-container" *ngIf="hasResults">
+        <div class="chat-header" *ngIf="currentSession">
+          <button class="new-chat-button" (click)="startNewSession()">
+            <span class="material-icons">add</span>
+            New Chat
+          </button>
+        </div>
+
+        <div class="loading-indicator" *ngIf="isLoading">
+          <div class="spinner"></div>
+          <p>Searching for the best results...</p>
+        </div>
+        
+        <div class="chat-thread" *ngIf="currentSession">
+          <div class="message" *ngFor="let message of currentSession.messages" [class.user-message]="message.role === 'user'" [class.assistant-message]="message.role === 'assistant'">
+            <div class="message-content" [innerHTML]="formatResponse(message.content)"></div>
+            <div class="message-timestamp">{{ message.timestamp | date:'shortTime' }}</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="copyright">
+        © {{ currentYear }} Search. All rights reserved.
+      </div>
+    </footer>
+  </div>
+</div> 
