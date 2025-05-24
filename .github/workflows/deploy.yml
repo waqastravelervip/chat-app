@@ -22,7 +22,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build -- --base-href=/hello-world/
+        run: npm run build -- --base-href=/chat-app/
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
