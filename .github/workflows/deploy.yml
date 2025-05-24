@@ -26,6 +26,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create environment files
+        run: |
+          mkdir -p src/environments
+          echo "export const environment = {
+            production: false,
+            openaiApiKey: '${{ secrets.OPENAI_API_KEY }}',
+            openaiApiUrl: 'https://api.openai.com/v1/chat/completions'
+          };" > src/environments/environment.ts
+          echo "export const environment = {
+            production: true,
+            openaiApiKey: '${{ secrets.OPENAI_API_KEY }}',
+            openaiApiUrl: 'https://api.openai.com/v1/chat/completions'
+          };" > src/environments/environment.prod.ts
+
       - name: Build
         run: npm run build -- --base-href=/chat-app/
 
