@@ -10,12 +10,34 @@ import { environment } from '../environments/environment';
 export class OpenAIService {
   private apiUrl = 'https://api.openai.com/v1/chat/completions';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    // Log the API key length on service initialization (for debugging)
+    console.log('API Key length:', environment.openaiApiKey?.length || 0);
+  }
 
   search(query: string): Observable<any> {
-    const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('Authorization', `Bearer ${environment.openaiApiKey}`);
+    // Ensure the API key exists and is properly formatted
+    if (!environment.openaiApiKey) {
+      console.error('OpenAI API key is missing');
+      return throwError(() => new Error('OpenAI API key is missing'));
+    }
+
+    const apiKey = environment.openaiApiKey.trim();
+    if (!apiKey.startsWith('sk-')) {
+      console.error('Invalid API key format. Key should start with "sk-"');
+      return throwError(() => new Error('Invalid API key format'));
+    }
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    });
+
+    // Log the headers for debugging (excluding the full API key)
+    console.log('Request headers:', {
+      'Content-Type': headers.get('Content-Type'),
+      'Authorization': 'Bearer ' + apiKey.substring(0, 7) + '...'
+    });
 
     const body = {
       model: "gpt-3.5-turbo",
@@ -40,7 +62,10 @@ export class OpenAIService {
     console.error('API Error:', error);
     if (error.status === 401) {
       console.error('Authentication failed. Please check your API key.');
-      console.log('API Key used:', environment.openaiApiKey);
+      // Log the first few characters of the API key for debugging
+      const apiKey = environment.openaiApiKey || '';
+      console.log('API Key prefix:', apiKey.substring(0, 7) + '...');
+      console.log('API Key length:', apiKey.length);
     }
     return throwError(() => error);
   }
